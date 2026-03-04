@@ -1,0 +1,41 @@
+# 1. 进入你的专属用户目录（根据你的系统记忆要求）
+cd ./users/<你的用户ID>/
+
+# 2. 拉取最新的代码到本地
+git clone https://github.com/gangleicn-web/OpenClaw_Wecom_Extention.git wecom-dev
+
+# 3. 使用 OpenClaw CLI 强制覆盖安装
+openclaw plugins install ./wecom-dev
+
+
+根据你上传的截图显示，在执行 openclaw plugins install ./wecom-dev 时，系统报错提示 Invalid config ... unknown channel id: wecom 以及 plugin not found: wecom。
+
+这是因为 OpenClaw 在安装插件时会立即校验 openclaw.json 配置文件。根据文档，你的 openclaw.json 中配置了 channels.wecom 和 plugins.entries.wecom，但此时插件尚未成功加载，导致校验失败。
+
+要解决这个问题并完成更新，请按照以下步骤操作：
+
+1. 修复配置冲突
+在执行安装命令前，你需要让 openclaw.json 回到“干净”状态，避免校验错误：
+
+打开 openclaw.json，暂时删除（或注释掉）所有包含 wecom 的配置项：
+
+plugins.entries.wecom
+
+channels.wecom
+
+plugins.installs.wecom（也就是你之前手动修改的那部分）
+
+2. 重新执行安装命令
+配置清理后，在命令行执行：
+
+Bash
+openclaw plugins install ./wecom-dev
+此时由于配置中没有 wecom 的校验需求，安装程序应该能正常运行。它会将 ./wecom-dev 下的代码拷贝到 ~/.openclaw/extensions/wecom。
+
+
+3. 启用并恢复配置
+安装成功后，执行以下命令启用插件：
+
+Bash
+openclaw plugins enable wecom
+然后，你就可以按照企业微信插件的要求，重新在 openclaw.json 的 channels.wecom 中填写你的 corpid、secret 等信息了。
