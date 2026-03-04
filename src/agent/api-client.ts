@@ -86,6 +86,56 @@ export async function getAccessToken(agent: ResolvedAgentAccount): Promise<strin
  * @param params.chatId 接收群 ID (群聊模式必填，互斥)
  * @param params.text 消息内容
  */
+// --- 新增：按 UTF-8 字节长度安全切分文本的辅助函数 ---
+function splitMessageByByteLength(text: string, maxBytes: number): string[] {
+  const chunks: string[] =[];
+  let currentChunk = "";
+  let currentBytes = 0;
+  const lines = text.split(/(\n+)/); 
+  
+  for (const line of lines) {
+    const lineBytes = Buffer.byteLength(line, 'utf8');
+    if (currentBytes + lineBytes > maxBytes) {
+      if (currentBytes > 0) {
+        chunks.push(currentChunk);
+        currentChunk = "";
+        currentBytes = 0;
+      }
+      if (lineBytes > maxBytes) {
+        let tempStr = "";
+        let tempBytes = 0;
+        for (const char of line) {
+          const charBytes = Buffer.byteLength(char, 'utf8');
+          if (tempBytes + charBytes > maxBytes) {
+            chunks.push(tempStr);
+            tempStr = char;
+            tempBytes = charBytes;
+          } else {
+            tempStr += char;
+            tempBytes += charBytes;
+          }
+        }
+        if (tempStr) {
+          currentChunk = tempStr;
+          currentBytes = tempBytes;
+        }
+      } else {
+        currentChunk = line;
+        currentBytes = lineBytes;
+      }
+    } else {
+      currentChunk += line;
+      currentBytes += lineBytes;
+    }
+  }
+  if (currentChunk) chunks.push(currentChunk);
+  return chunks;
+}
+
+/**
+ * **sendText (发送文本消息)**
+ * 已内置超过 2048 字节自动分片与限流延迟逻辑
+ */
 export async function sendText(params: {
     agent: ResolvedAgentAccount;
     toUser?: string;
@@ -102,45 +152,43 @@ export async function sendText(params: {
         ? `${API_ENDPOINTS.SEND_APPCHAT}?access_token=${encodeURIComponent(token)}`
         : `${API_ENDPOINTS.SEND_MESSAGE}?access_token=${encodeURIComponent(token)}`;
 
-    // 修复问题2：将 msgtype 改为 markdown，并使用 markdown: { content: text }
-    const body = useChat
-        ? { chatid: chatId, msgtype: "markdown", markdown: { content: text } }
-        : {
-            touser: toUser,
-            toparty: toParty,
-            totag: toTag,
-            msgtype: "markdown",
-            agentid: agent.agentId,
-            markdown: { content: text }
-        };
+    // 核心修复：在这里统一进行分块（安全限制在 2000 字节，预留余量）
+    const chunks = splitMessageByByteLength(text, 2000);
 
-    const res = await wecomFetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-    }, { proxyUrl: resolveWecomEgressProxyUrlFromNetwork(agent.network), timeoutMs: LIMITS.REQUEST_TIMEOUT_MS });
-    const json = await res.json() as {
-        errcode?: number;
-        errmsg?: string;
-        invaliduser?: string;
-        invalidparty?: string;
-        invalidtag?: string;
-    };
+    for (let i = 0; i < chunks.length; i++) {
+        const chunk = chunks[i];
+        if (!chunk) continue;
 
-    if (json?.errcode !== 0) {
-        throw new Error(`send failed: ${json?.errcode} ${json?.errmsg}`);
+        // 修改为 markdown 格式
+        const body = useChat
+            ? { chatid: chatId, msgtype: "markdown", markdown: { content: chunk } }
+            : {
+                touser: toUser,
+                toparty: toParty,
+                totag: toTag,
+                msgtype: "markdown",
+                agentid: agent.agentId,
+                markdown: { content: chunk }
+            };
+
+        const res = await wecomFetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        }, { proxyUrl: resolveWecomEgressProxyUrlFromNetwork(agent.network), timeoutMs: LIMITS.REQUEST_TIMEOUT_MS });
+        
+        const json = await res.json() as any;
+
+        if (json?.errcode !== 0) {
+            throw new Error(`send failed: ${json?.errcode} ${json?.errmsg}`);
+        }
+
+        // 核心修复：块与块之间强制增加 1000 毫秒延迟，完美规避企业微信 1次/秒 的防刷限流
+        if (i < chunks.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
     }
-
-    if (json?.invaliduser || json?.invalidparty || json?.invalidtag) {
-        const details =[
-            json.invaliduser ? `invaliduser=${json.invaliduser}` : "",
-            json.invalidparty ? `invalidparty=${json.invalidparty}` : "",
-            json.invalidtag ? `invalidtag=${json.invalidtag}` : ""
-        ].filter(Boolean).join(", ");
-        throw new Error(`send partial failure: ${details}`);
-    }
-}
-/**
+}/**
  * **uploadMedia (上传媒体文件)**
  * 
  * 上传临时素材到企业微信。
