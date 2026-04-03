@@ -42,7 +42,7 @@ openclaw plugins enable wecom
 
 
 
-也可以先删除wecom插件,然后上传openclaw_reference.json, openclaw gateway restart之后,会下载新的插件.这样就替换掉了官方的插件.
+也可以先删除wecom插件,然后上传openclaw_reference.json,并修改为oepnclaw.json. openclaw gateway restart之后,会下载新的插件.这样就替换掉了官方的插件.
 
 
 查看已安装插件列表，确认名称
