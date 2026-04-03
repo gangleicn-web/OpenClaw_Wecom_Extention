@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.3.28",
+    "lastTouchedAt": "2026-04-03T01:31:54.391Z"
+  },
+  "env": {
+    "TAVILY_API_KEY": "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"
+  },
+  "wizard": {
+    "lastRunAt": "2026-02-27T07:57:45.599Z",
+    "lastRunVersion": "2026.2.25",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
+  "auth": {
+    "profiles": {
+      "google:default": {
+        "provider": "google",
+        "mode": "api_key"
+      }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "deepseek": {
+        "baseUrl": "https://api.deepseek.com/v1",
+        "apiKey": "sk-0defff7f5c3d41f284cc08dc100c5780",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "deepseek-chat",
+            "name": "DeepSeek Chat",
+            "api": "openai-completions",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek-reasoner",
+            "name": "DeepSeek Reasoner",
+            "api": "openai-completions",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "deepseek/deepseek-reasoner"
+      },
+      "models": {
+        "google/gemini-3.1-pro-preview": {
+          "alias": "gemini"
+        },
+        "deepseek/deepseek-reasoner": {}
+      },
+      "workspace": "/root/.openclaw/workspace",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "timeoutSeconds": 600,
+      "maxConcurrent": 1,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        },
+        "bootstrap-extra-files": {
+          "enabled": true
+        },
+        "command-logger": {
+          "enabled": true
+        },
+        "session-memory": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "channels": {
+    "wecom": {
+      "enabled": true,
+      "bot": {
+        "token": "5kyRdmz12LH1gUU",
+        "encodingAESKey": "nXfY8dOYS4NL2WQ1YDNh3Q6t4QQSzndUF7y2xW14p7V",
+        "streamPlaceholderContent": "正在思考...",
+        "welcomeText": "你好！我是 AI 助手",
+        "dm": {
+          "policy": "open"
+        }
+      },
+      "agent": {
+        "corpId": "wwdf8d15fd8f8c77ab",
+        "corpSecret": "dBUervW4WPdQEYm-rqo6y0mmM3MMl3pmgYyt4_Xyi7E",
+        "agentId": "1000007",
+        "token": "q6u8c5GffScxnBtts94b98oR",
+        "encodingAESKey": "0quvUKULPTTfJIPdn15JbWXqbWwt6BrPAxpo0BArjZ4",
+        "welcomeText": "你好！我是 AI 助手",
+        "dm": {
+          "policy": "open"
+        }
+      }
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "lan",
+    "controlUi": {
+      "allowedOrigins": [
+        "http://43.160.211.138:18789"
+      ],
+      "allowInsecureAuth": false,
+      "dangerouslyDisableDeviceAuth": false
+    },
+    "auth": {
+      "mode": "token",
+      "token": "77e685a4bf3c3f644b53ed2ed85305589d2e9ef85fdd23d1"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    }
+  },
+  "plugins": {
+    "entries": {
+      "feishu": {
+        "enabled": false,
+        "config": {}
+      },
+      "qqbot": {
+        "enabled": false
+      },
+      "ddingtalk": {
+        "enabled": false,
+        "config": {}
+      },
+      "wecom": {
+        "enabled": true,
+        "config": {}
+      },
+      "adp-openclaw": {
+        "enabled": false
+      }
+    },
+    "installs": {
+      "qqbot": {
+        "source": "npm",
+        "spec": "@sliverp/qqbot@latest",
+        "installPath": "/root/.openclaw/extensions/qqbot",
+        "version": "1.5.0",
+        "resolvedName": "@sliverp/qqbot",
+        "resolvedVersion": "1.5.0",
+        "resolvedSpec": "@sliverp/qqbot@1.5.0",
+        "integrity": "sha512-CCEqfgtVCDYrpAc59et4BG8WjKAtRrFjxgYHh0PmJS4XLPsLH9m+WHtwy+PY6gCiiEzpqyVUMVDDV0PXqy7npA==",
+        "shasum": "d0d9465dbe1306583944eb833fff2e19bed8fde6",
+        "resolvedAt": "2026-02-26T04:22:44.662Z",
+        "installedAt": "2026-02-26T04:24:12.161Z"
+      },
+      "ddingtalk": {
+        "source": "npm",
+        "spec": "@largezhou/ddingtalk",
+        "installPath": "/root/.openclaw/extensions/ddingtalk",
+        "version": "1.3.2",
+        "resolvedName": "@largezhou/ddingtalk",
+        "resolvedVersion": "1.3.2",
+        "resolvedSpec": "@largezhou/ddingtalk@1.3.2",
+        "integrity": "sha512-WizzhkxDVZidTub9SAEQtzYeGtw2c3sMfBCfBVnTwutYpniuD/u0zNobRu4IVr+4sMicU1MA3LvIKNjWpbaR3Q==",
+        "shasum": "453c3fe0deecfd0d7da6776904f2c1439a60c107",
+        "resolvedAt": "2026-02-26T04:24:17.947Z",
+        "installedAt": "2026-02-26T04:24:34.145Z"
+      },
+      "wecom": {
+        "source": "npm",
+        "spec": "git+https://github.com/gangleicn-web/OpenClaw_Wecom_Extention.git",
+        "installPath": "/root/.openclaw/extensions/wecom",
+        "version": "2026.2.5",
+        "installedAt": "2026-02-11T09:49:25.555Z"
+      },
+      "adp-openclaw": {
+        "source": "npm",
+        "spec": "adp-openclaw",
+        "installPath": "/root/.openclaw/extensions/adp-openclaw",
+        "version": "0.0.25",
+        "resolvedName": "adp-openclaw",
+        "resolvedVersion": "0.0.25",
+        "resolvedSpec": "adp-openclaw@0.0.25",
+        "integrity": "sha512-4wUlP4ip3ivuvS2Y7AAGWvR80i44xY2QoHlfnD6vb6F5Y/peFaCjUwN4FE9YKiWobEChxBXtDzp++zR06VzRyQ==",
+        "shasum": "3e73325f3a85a7cb46494a4b05c18166637307c9",
+        "resolvedAt": "2026-02-26T04:25:08.002Z",
+        "installedAt": "2026-02-26T04:25:09.134Z"
+      }
+    }
+  }
+}
