@@ -39,3 +39,43 @@ openclaw plugins install ./wecom-dev
 Bash
 openclaw plugins enable wecom
 然后，你就可以按照企业微信插件的要求，重新在 openclaw.json 的 channels.wecom 中填写你的 corpid、secret 等信息了。
+
+
+
+也可以先删除wecom插件,然后上传openclaw_reference.json, openclaw gateway restart之后,会下载新的插件.这样就替换掉了官方的插件.
+
+
+查看已安装插件列表，确认名称
+openclaw plugins list
+
+# 卸载插件
+openclaw plugins remove <插件名称>
+# 或者
+openclaw plugins uninstall <插件名称>
+
+
+
+
+
+
+如何修复gateway disconnect的问题.
+
+
+Fix 1: The Standard Fix — Approve the Pending Device (Most Common)
+This resolves the error for the majority of users on a fresh install or after connecting a new node. The gateway has received your connection request and placed it in a Pending state, but it needs explicit administrator approval before allowing access.
+
+Step 1: List pending devices
+
+bashopenclaw devices list
+Look for any device showing a Pending status. Copy the Request Code (not the Device ID — these are different values).
+
+Step 2: Approve the pending device
+
+bashopenclaw devices approve <REQUEST_ID>
+Paste the request code from Step 1 in place of <REQUEST_ID>.
+
+Step 3: Verify
+
+Open http://localhost:18789 in your browser (or your gateway’s URL). The “pairing required” error should be gone and OpenClaw should connect successfully.
+
+If openclaw devices list returns nothing pending or returns its own error, move to Fix 2.
